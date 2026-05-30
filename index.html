@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f3ead2">
+<title>Tour de Burgers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%94%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --paper: #f3ead2;
+    --ink: #1a1a1a;
+    --line: #2a2a2a;
+    --red: #c0392b;
+    --muted: #6b6b6b;
+    --row: #ffffff;
+    --selected: #1a1a1a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+    max-width: 640px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+  header {
+    text-align: center;
+    padding: 20px 0 10px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: "Impact", "Oswald", "Helvetica Neue", sans-serif;
+    font-weight: 900;
+    font-size: clamp(34px, 9vw, 52px);
+    letter-spacing: 1px;
+    margin: 0 0 6px;
+    text-transform: uppercase;
+  }
+  .subtitle {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .subtitle .worst { color: var(--red); font-weight: 700; }
+  .subtitle .best { color: var(--ink); font-weight: 700; }
+
+  .place {
+    background: var(--row);
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    padding: 14px 14px 12px;
+  }
+  .place-name {
+    font-weight: 800;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .place-name.cph { font-family: "Impact","Oswald",sans-serif; letter-spacing: 1px; }
+  .place-name.popl { font-family: "Impact","Oswald",sans-serif; letter-spacing: 2px; }
+  .place-name.dandelion { font-style: italic; font-weight: 700; }
+  .place-name.fattys { color: var(--red); font-family: "Impact","Oswald",sans-serif; letter-spacing: 1px; }
+  .place-name.joker { letter-spacing: 3px; }
+  .joker-icon { font-size: 24px; display: block; margin-bottom: 2px; }
+
+  .scores {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 4px;
+  }
+  .score {
+    aspect-ratio: 1 / 1;
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.05s ease, background 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+  .score:active { transform: scale(0.92); }
+  .score.selected {
+    background: var(--selected);
+    color: var(--paper);
+    border-color: var(--selected);
+  }
+
+  .clear-row {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .clear-btn {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .clear-btn:active { background: var(--muted); color: var(--paper); }
+
+  .map-section {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 2px solid var(--line);
+  }
+  .map-title {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .map {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+  }
+  .map-meta {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-style: italic;
+  }
+  footer {
+    text-align: center;
+    padding: 24px 0 16px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tour de Burgers</h1>
+  <div class="subtitle">Rate each from <span class="worst">0</span> (worst) to <span class="best">10</span> (best)</div>
+</header>
+
+<main id="places"></main>
+
+<div class="clear-row">
+  <button class="clear-btn" id="clearAll">Reset all scores</button>
+</div>
+
+<section class="map-section">
+  <div class="map-title">The Route</div>
+  <img class="map" src="map.png" alt="Tour de Burgers route map — Copenhagen">
+  <div class="map-meta">~5 stops · Copenhagen</div>
+</section>
+
+<footer>Saturday side quest</footer>
+
+<script>
+  const PLACES = [
+    { id: "cph",       name: "CPH Smash Burgers", className: "cph" },
+    { id: "popl",      name: "POPL",              className: "popl" },
+    { id: "dandelion", name: "Dandelion Burger",  className: "dandelion" },
+    { id: "fattys",    name: "Fatty's",           className: "fattys" },
+    { id: "joker",     name: "Joker",             className: "joker", icon: "🍔" }
+  ];
+
+  const STORAGE_KEY = "burgertour.scores.v1";
+
+  function loadScores() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function saveScores(s) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  }
+
+  const state = loadScores();
+  const root = document.getElementById("places");
+
+  PLACES.forEach(place => {
+    const card = document.createElement("section");
+    card.className = "place";
+
+    const name = document.createElement("div");
+    name.className = "place-name " + place.className;
+    if (place.icon) {
+      const ic = document.createElement("span");
+      ic.className = "joker-icon";
+      ic.textContent = place.icon;
+      name.appendChild(ic);
+    }
+    name.appendChild(document.createTextNode(place.name));
+    card.appendChild(name);
+
+    const grid = document.createElement("div");
+    grid.className = "scores";
+    for (let n = 0; n <= 10; n++) {
+      const btn = document.createElement("button");
+      btn.className = "score";
+      btn.type = "button";
+      btn.textContent = n;
+      btn.dataset.score = n;
+      if (state[place.id] === n) btn.classList.add("selected");
+      btn.addEventListener("click", () => {
+        const current = state[place.id];
+        if (current === n) {
+          delete state[place.id];
+        } else {
+          state[place.id] = n;
+        }
+        saveScores(state);
+        grid.querySelectorAll(".score").forEach(b => {
+          b.classList.toggle("selected", Number(b.dataset.score) === state[place.id]);
+        });
+      });
+      grid.appendChild(btn);
+    }
+    card.appendChild(grid);
+    root.appendChild(card);
+  });
+
+  document.getElementById("clearAll").addEventListener("click", () => {
+    if (!confirm("Reset every score?")) return;
+    Object.keys(state).forEach(k => delete state[k]);
+    saveScores(state);
+    document.querySelectorAll(".score.selected").forEach(b => b.classList.remove("selected"));
+  });
+</script>
+
+</body>
+</html>
