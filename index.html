@@ -158,20 +158,49 @@
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
-  .marker-pin {
+  .marker-tag {
     background: var(--ink);
     color: var(--paper);
+    padding: 4px 8px 4px 4px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1.5px solid var(--paper);
+    line-height: 1;
+    transform: translateX(-50%);
+  }
+  .marker-tag .num {
+    background: var(--paper);
+    color: var(--ink);
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-size: 11px;
     font-weight: 800;
-    font-size: 14px;
-    border: 2px solid var(--paper);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    flex-shrink: 0;
   }
+  .marker-tag::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--ink);
+  }
+  .leaflet-div-icon { background: transparent; border: none; }
   footer {
     text-align: center;
     padding: 24px 0 16px;
@@ -206,7 +235,7 @@
 <script>
   const PLACES = [
     { id: "cph",       name: "CPH Smash Burgers", className: "cph",       address: "Allégade 11, Frederiksberg",       lat: 55.67605, lng: 12.53179 },
-    { id: "gasoline",  name: "Gasoline Grill",    className: "gasoline",  address: "Strandgade 95, Christianshavn",     lat: 55.67786, lng: 12.59682 },
+    { id: "gasoline",  name: "Gasoline Grill",    className: "gasoline",  address: "Landgreven 10, Indre By",           lat: 55.68324, lng: 12.58515 },
     { id: "dandelion", name: "Dandelion Burger",  className: "dandelion", address: "Store Kongensgade 70, Indre By",    lat: 55.68444, lng: 12.58803 },
     { id: "fattys",    name: "Fatty's",           className: "fattys",    address: "Rantzausgade 22B, Nørrebro",        lat: 55.68633, lng: 12.55051 },
     { id: "joker",     name: "Joker",             className: "joker",     address: "Surprise stop",                     icon: "🍔" }
@@ -285,10 +314,10 @@
   const markers = pinned.map((p, i) => {
     const icon = L.divIcon({
       className: "",
-      html: `<div class="marker-pin">${i + 1}</div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 15],
-      popupAnchor: [0, -15]
+      html: `<div class="marker-tag" style="position:relative;"><span class="num">${i + 1}</span>${p.name}</div>`,
+      iconSize: [1, 1],
+      iconAnchor: [0, 8],
+      popupAnchor: [0, -8]
     });
     const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
     const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=walking`;
